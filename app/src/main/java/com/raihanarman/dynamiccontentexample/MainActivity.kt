@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,44 +29,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(){
-    val greetingListState = remember {
-        mutableStateListOf<String>("John")
-    }
+fun MainScreen(viewModel: MainViewModel = MainViewModel()){
 
-    val newNameStateContent = remember {
-        mutableStateOf("")
-    }
+    val newNameStateContent = viewModel.textFieldState.observeAsState("")
 
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        GreatingList(greetingListState, {
-            greetingListState.add(newNameStateContent.value)
-        },newNameStateContent.value,
-            {
-              newValue ->   newNameStateContent.value
-            })
+        GreatingMessage(newNameStateContent.value){
+                newValue ->   viewModel.onTextChanged(newValue)
+        }
     }
 }
 
 @Composable
-fun GreatingList(
-        nameList: List<String>,
-        buttonClick: () -> Unit,
+fun GreatingMessage(
         textFieldvalue: String,
         textFieldUpdate: (newValue: String) -> Unit
 ){
-    for (name in nameList){
-        Greeting(name = name)
-    }
 
-    
     TextField(value = textFieldvalue, onValueChange = textFieldUpdate)
 
-    Button(onClick = buttonClick){
-        Text("Add new name")
+    Button(onClick = {}){
+        Text(textFieldvalue)
     }
 }
 
